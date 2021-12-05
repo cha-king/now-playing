@@ -35,7 +35,8 @@ async def get_recently_played():
             name=song["track"]["name"],
             artist=song["track"]["artists"][0]["name"],
             album=song["track"]["album"]["name"],
-            href=song['context']['external_urls']['spotify']
+            href=song['context']['external_urls']['spotify'],
+            image_url=song['track']['album']['images'][0]['url']
         )
         for song in recently_played["items"]
     ]
@@ -54,7 +55,8 @@ async def get_now_playing():
         name=currently_playing['item']['name'],
         artist=currently_playing['item']['artists'][0]['name'],
         album=currently_playing['item']['album']['name'],
-        href=currently_playing['context']['external_urls']['spotify']
+        href=currently_playing['context']['external_urls']['spotify'],
+        image_url=currently_playing['item']['album']['images'][0]['url']
     )
 
     return song
