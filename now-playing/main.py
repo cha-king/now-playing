@@ -1,6 +1,7 @@
 import os
 
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 
 from . import schema
 from .spotify import Spotify
@@ -10,6 +11,9 @@ LIST_LENGTH = 5
 
 
 app = FastAPI()
+api = FastAPI()
+app.mount('/api', api)
+app.mount("/", StaticFiles(directory="now-playing/static", html=True), name="static")
 
 
 @app.on_event("startup")
@@ -19,12 +23,12 @@ async def on_startup():
     refresh_token = os.getenv("REFRESH_TOKEN")
 
     spotify = Spotify(client_id, client_secret, refresh_token)
-    app.state.spotify = spotify
+    api.state.spotify = spotify
 
 
-@app.get("/recently-played", response_model=list[schema.Song])
+@api.get("/recently-played", response_model=list[schema.Song])
 async def get_recently_played():
-    recently_played = await app.state.spotify.get_recently_played()
+    recently_played = await api.state.spotify.get_recently_played()
 
     songs = [
         schema.Song(
@@ -39,9 +43,9 @@ async def get_recently_played():
     return songs
 
 
-@app.get("/now-playing", response_model=schema.Song)
+@api.get("/now-playing", response_model=schema.Song)
 async def get_now_playing():
-    currently_playing = await app.state.spotify.get_currently_playing()
+    currently_playing = await api.state.spotify.get_currently_playing()
 
     if currently_playing is None:
         return {}
