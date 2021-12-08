@@ -1,0 +1,28 @@
+.song {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    grid-template-rows: 1fr 1fr 1fr;
+    width: 430px;
+    margin: 20px;
+    background-color: #ffc341;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+}
+
+.song > div {
+    padding: 16px;
+    font-size: .8em;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+img {
+    grid-row-start: 1;
+    grid-row-end: 4;
+    max-width: 100%;
+    height: 100%;
+    /* width: 160px; */
+    /* height: auto; */
+}
