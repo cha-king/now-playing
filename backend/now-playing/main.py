@@ -1,6 +1,7 @@
 import os
+from typing import Optional
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 from fastapi.staticfiles import StaticFiles
 
 from . import schema
@@ -49,7 +50,7 @@ async def get_now_playing():
     currently_playing = await api.state.spotify.get_currently_playing()
 
     if currently_playing is None:
-        return {}
+        return Response(status_code=204)
 
     song = schema.Song(
         name=currently_playing['item']['name'],
