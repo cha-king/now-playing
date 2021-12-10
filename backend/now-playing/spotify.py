@@ -1,4 +1,7 @@
+import asyncio
+import datetime
 import time
+from asyncio import Task
 from typing import Optional
 
 from httpx import AsyncClient
@@ -6,11 +9,15 @@ from httpx import AsyncClient
 
 TOKEN_URL = "https://accounts.spotify.com/api/token"
 
+POLL_TIME = datetime.timedelta(seconds=1)
+
 
 class Spotify:
     def __init__(self, client_id: str, client_secret: str, refresh_token: str):
         self._client = AsyncClient(http2=True)
         self._token = AccessToken(self._client, client_id, client_secret, refresh_token)
+        self.currently_playing: Optional[dict] = None
+        self._task: Task = Optional[None]
 
     async def get_recently_played(self, limit: int = 5) -> dict:
         access_token = await self._token.get()
@@ -36,6 +43,17 @@ class Spotify:
             return None
         else:
             return response.json()
+
+    def start(self):
+        self._task = asyncio.create_task(self._loop())
+
+    def stop(self):
+        self._task.cancel()
+
+    async def _loop(self):
+        while True:
+            self.currently_playing = await self.get_currently_playing()
+            await asyncio.sleep(POLL_TIME.total_seconds())
 
 
 class AccessToken:

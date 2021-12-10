@@ -24,7 +24,13 @@ async def on_startup():
     refresh_token = os.getenv("REFRESH_TOKEN")
 
     spotify = Spotify(client_id, client_secret, refresh_token)
+    spotify.start()
     api.state.spotify = spotify
+
+
+@app.on_event("shutdown")
+async def on_shutdown():
+    api.state.spotify.stop()
 
 
 @api.get("/recently-played", response_model=list[schema.Song])
@@ -47,7 +53,7 @@ async def get_recently_played():
 
 @api.get("/now-playing", response_model=schema.Song)
 async def get_now_playing():
-    currently_playing = await api.state.spotify.get_currently_playing()
+    currently_playing = api.state.spotify.currently_playing
 
     if currently_playing is None:
         return Response(status_code=204)
