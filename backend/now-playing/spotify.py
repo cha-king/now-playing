@@ -47,6 +47,12 @@ class Spotify:
     def start(self):
         self._task = asyncio.create_task(self._loop())
 
+        def handle_exception(future: Future):
+            if exception := future.exception():
+                raise exception
+
+        self._task.add_done_callback(handle_exception)
+
     def stop(self):
         self._task.cancel()
 
