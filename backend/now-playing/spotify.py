@@ -78,6 +78,10 @@ class Spotify:
             currently_playing = await self.get_currently_playing()
             logger.debug("Acquired song")
 
+            # Weird Spotify response handling
+            if currently_playing and not currently_playing["item"]:
+                continue
+
             if currently_playing:
                 new_id = currently_playing["item"]["id"]
             else:
