@@ -64,9 +64,10 @@ class Spotify:
 
         self._task.add_done_callback(handle_exception)
 
-    def stop(self):
+    async def stop(self):
         self._task.cancel()
         logger.info("get_currently_playing task canceled")
+        await self._client.aclose()
 
     def subscribe(self, websocket: WebSocket):
         self._websockets.add(websocket)

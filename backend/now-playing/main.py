@@ -40,7 +40,7 @@ async def on_startup():
 
 @app.on_event("shutdown")
 async def on_shutdown():
-    api.state.spotify.stop()
+    await api.state.spotify.stop()
 
 
 @api.get("/recently-played", response_model=list[schema.Song])
