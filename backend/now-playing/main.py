@@ -1,3 +1,4 @@
+import logging
 import os
 from typing import Optional
 
@@ -9,6 +10,11 @@ from .spotify import Spotify
 
 
 LIST_LENGTH = 5
+
+
+LOG_LEVEL = os.environ.get("LOG_LEVEL", logging.INFO)
+logging.basicConfig(level=LOG_LEVEL)
+logger = logging.getLogger(__name__)
 
 
 app = FastAPI()
