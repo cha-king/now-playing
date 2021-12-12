@@ -11,13 +11,26 @@ COPY ./frontend/src ./src
 RUN npm run build
 
 
-FROM python
+FROM python:3.10 as python-builder
 
-WORKDIR /app
+WORKDIR /build
 
 COPY ./backend/requirements.txt ./requirements.txt
 
-RUN pip3 install -r requirements.txt
+RUN pip wheel -r requirements.txt -w ./wheels
+
+
+FROM python:3.10-slim
+
+COPY --from=python-builder /build /build
+
+WORKDIR /build
+
+COPY ./backend/requirements.txt ./requirements.txt
+
+RUN pip3 install -r requirements.txt --no-index --find-links ./wheels/
+
+WORKDIR /app
 
 COPY ./backend/now-playing ./now-playing
 
