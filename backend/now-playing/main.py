@@ -14,7 +14,11 @@ LIST_LENGTH = 5
 
 LOG_LEVEL = os.environ.get("LOG_LEVEL", logging.INFO)
 logging.basicConfig(level=LOG_LEVEL)
+
 logger = logging.getLogger(__name__)
+
+# Removes duplicate uvicorn logging
+logging.getLogger("uvicorn").propagate = False
 
 
 app = FastAPI()
