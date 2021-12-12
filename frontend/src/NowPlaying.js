@@ -19,9 +19,10 @@ function NowPlaying() {
 
     useEffect(() => {
         function connect() {
-            // const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-            // const url = `${protocol}//${window.location.host}/api/ws/now-playing`;
-            const url = 'ws://localhost:8000/api/ws/now-playing';
+            // TODO: Find workaround for CRA proxy not working for WS on Chrome
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+            const url = `${protocol}//${window.location.host}/api/ws/now-playing`;
+            // const url = 'ws://localhost:8000/api/ws/now-playing';
             const ws = new WebSocket(url);
             ws.onmessage = function(event) {
                 const song = JSON.parse(event.data);
