@@ -1,9 +1,9 @@
 import logging
 import os
-from typing import Optional
 
-from fastapi import FastAPI, Response
+from fastapi import FastAPI, Response, WebSocket
 from fastapi.staticfiles import StaticFiles
+from starlette.websockets import WebSocketDisconnect
 
 from . import schema
 from .spotify import Spotify
@@ -73,3 +73,15 @@ async def get_now_playing():
     )
 
     return song
+
+
+@api.websocket("/ws/now-playing")
+async def websocket_now_playing(websocket: WebSocket):
+    await websocket.accept()
+    api.state.spotify.subscribe(websocket)
+    logger.debug("Subscribed websocket")
+    try:
+        await websocket.receive_text()
+    except WebSocketDisconnect:
+        api.state.spotify.unsubscribe(websocket)
+        logger.debug("Unsubscribed websocket")
