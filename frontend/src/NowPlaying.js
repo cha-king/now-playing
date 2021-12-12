@@ -37,7 +37,14 @@ function NowPlaying() {
     }, []);
 
     if (song === null) {
-        return null
+        return (
+            <div className={styles.empty}>
+                <div>
+                    <p>Nothing is currently playing..</p>
+                    <p>Check back later!</p>
+                </div>
+            </div>
+        )
     }
     
     // return (<Song title={song.name} artist={song.artist} album={song.album} imageUrl={song.image_url}/>)

@@ -31,3 +31,9 @@
 .song-name {
     font-size: 1.4rem;
 }
+
+.empty {
+    text-align: center;
+    font-size: 1.8rem;
+    margin: 5em 0;
+}
