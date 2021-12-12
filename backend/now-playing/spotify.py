@@ -71,6 +71,9 @@ class Spotify:
     def subscribe(self, websocket: WebSocket):
         self._websockets.add(websocket)
 
+    def unsubscribe(self, websocket: WebSocket):
+        self._websockets.remove(websocket)
+
     async def _loop(self):
         logger.info("Starting get_currently_playing task..")
         while True:
