@@ -6,7 +6,25 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  background-color: #fffbc2;
+  background-color: #E6B7B2;
+  color: #BC4F43;
+}
+
+header {
+  background-color: #CA7168; 
+  color: #F3DBD8;
+}
+
+a {
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+a:visited {
+  color: inherit;
 }
 
 code {
