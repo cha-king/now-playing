@@ -17,6 +17,24 @@ function NowPlaying() {
         getNowPlaying();
     }, []);
 
+    useEffect(() => {
+        function connect() {
+            // const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+            // const url = `${protocol}//${window.location.host}/api/ws/now-playing`;
+            const url = 'ws://localhost:8000/api/ws/now-playing';
+            const ws = new WebSocket(url);
+            ws.onmessage = function(event) {
+                const song = JSON.parse(event.data);
+                setSong(Object.keys(song).length !== 0 ? song : null);
+            };
+            ws.onclose = function(event) {
+                const delay = 1000 + Math.random() * 1000;
+                setTimeout(connect, delay)
+            };
+        }
+        connect();
+    }, []);
+
     if (song === null) {
         return null
     }
