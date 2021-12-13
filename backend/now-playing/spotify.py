@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 class Spotify:
     def __init__(self, client_id: str, client_secret: str, refresh_token: str):
-        self._client = AsyncClient(http2=True, timeout=HTTP_TIMEOUT)
+        self._client = AsyncClient(timeout=HTTP_TIMEOUT)
         self._token = AccessToken(self._client, client_id, client_secret, refresh_token)
         self.currently_playing: Optional[dict] = None
         self._task: Task = Optional[None]
