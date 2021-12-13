@@ -6,7 +6,7 @@ from asyncio import Task, Future
 from typing import Optional
 
 from fastapi import WebSocket
-from httpx import AsyncClient
+from httpx import AsyncClient, ReadTimeout
 
 from .schema import Song
 
@@ -79,7 +79,12 @@ class Spotify:
         logger.info("Starting get_currently_playing task..")
         while True:
             await asyncio.sleep(POLL_TIME.total_seconds())
-            currently_playing = await self.get_currently_playing()
+            try:
+                currently_playing = await self.get_currently_playing()
+            except ReadTimeout:
+                logger.warning("HTTP timeout")
+                continue
+
             logger.debug("Acquired song")
 
             # Weird Spotify response handling
