@@ -36,6 +36,6 @@ COPY ./backend/now-playing ./now-playing
 
 COPY --from=react-builder /build/build /app/now-playing/static
 
-CMD ["uvicorn", "now-playing:app", "--host=0.0.0.0"]
+CMD ["uvicorn", "now-playing:app", "--host=0.0.0.0", "--proxy-headers"]
 
 EXPOSE 8000
