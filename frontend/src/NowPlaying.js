@@ -50,11 +50,23 @@ function NowPlaying() {
     // return (<Song title={song.name} artist={song.artist} album={song.album} imageUrl={song.image_url}/>)
     return (
         <div className={styles['now-playing']}>
-            <img src={song.image_url} alt={song.album}/>
+            <img src={song.image_href} alt={song.album}/>
             <ul>
-                <li className={styles['song-name']}>{song.name}</li>
-                <li className={styles['album-name']}>{song.album}</li>
-                <li className={styles['artist-name']}>{song.artist}</li>
+                <li className={styles['song-name']}>
+                    <a href={song.song_href} target="_blank" rel="noreferrer">
+                        {song.name}
+                    </a>
+                </li>
+                <li className={styles['album-name']}>
+                    <a href={song.album_href} target="_blank" rel="noreferrer">
+                        {song.album}
+                    </a>
+                </li>
+                <li className={styles['artist-name']}>
+                    <a href={song.artist_href} target="_blank" rel="noreferrer">
+                        {song.artist}
+                    </a>
+                </li>
             </ul>
         </div>
     )

@@ -5,5 +5,7 @@ class Song(BaseModel):
     name: str
     album: str
     artist: str
-    href: HttpUrl
-    image_url: HttpUrl
+    song_href: HttpUrl
+    album_href: HttpUrl
+    artist_href: HttpUrl
+    image_href: HttpUrl
