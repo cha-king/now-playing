@@ -6,7 +6,7 @@ from asyncio import Task, Future
 from typing import Optional
 
 from fastapi import WebSocket
-from httpx import AsyncClient, RequestError
+from httpx import AsyncClient, RequestError, HTTPStatusError
 
 from .schema import Song
 
@@ -84,6 +84,12 @@ class Spotify:
             except RequestError:
                 logger.exception("Unable to get currently playing")
                 continue
+            except HTTPStatusError as e:
+                if 500 <= e.response.status_code <= 599:
+                    logger.exception("Unable to get currently playing")
+                    continue
+                else:
+                    raise
 
             logger.debug("Acquired song")
 
