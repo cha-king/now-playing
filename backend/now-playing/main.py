@@ -5,6 +5,7 @@ from fastapi import FastAPI, Response, WebSocket
 from fastapi.staticfiles import StaticFiles
 from starlette.websockets import WebSocketDisconnect
 
+from . import sentry
 from . import schema
 from .spotify import Spotify
 
@@ -29,6 +30,7 @@ app.mount("/", StaticFiles(directory="now-playing/static", html=True), name="sta
 
 @app.on_event("startup")
 async def on_startup():
+    sentry.init()
     client_id = os.getenv("CLIENT_ID")
     client_secret = os.getenv("CLIENT_SECRET")
     refresh_token = os.getenv("REFRESH_TOKEN")
