@@ -1,11 +1,24 @@
 from pydantic import BaseModel, HttpUrl
 
 
+class Artist(BaseModel):
+    name: str
+    href: HttpUrl
+
+
+class Color(BaseModel):
+    red: int
+    green: int
+    blue: int
+
+
+class Album(BaseModel):
+    name: str
+    href: HttpUrl
+    theme: Color
+
+
 class Song(BaseModel):
     name: str
-    album: str
-    artist: str
-    song_href: HttpUrl
-    album_href: HttpUrl
-    artist_href: HttpUrl
-    image_href: HttpUrl
+    album: Album
+    artist: Artist
