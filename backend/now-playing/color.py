@@ -8,9 +8,9 @@ from typing import List, Tuple
 QUANTIZATION_FACTOR = 64
 
 
-def get_colors_from_url(client: httpx.Client, url: str) -> List[Tuple]:
+def get_colors_from_url(client: httpx.Client, url: str, n: int = 4) -> List[Tuple]:
     img = load_image(client, url)
-    colors = get_colors(img)
+    colors = get_colors(img, n)
     return colors
 
 
@@ -23,7 +23,7 @@ def load_image(client: httpx.Client, url: str) -> Image:
     return img
 
 
-def get_colors(img: Image, n=4) -> List[Tuple]:
+def get_colors(img: Image, n: int = 4) -> List[Tuple]:
     q_img = img.quantize(QUANTIZATION_FACTOR)
 
     pallete = q_img.getpalette()
