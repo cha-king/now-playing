@@ -8,14 +8,14 @@ from typing import List, Tuple
 QUANTIZATION_FACTOR = 64
 
 
-def get_colors_from_url(client: httpx.Client, url: str, n: int = 4) -> List[Tuple]:
-    img = load_image(client, url)
+async def get_colors_from_url(client: httpx.AsyncClient, url: str, n: int = 4) -> List[Tuple]:
+    img = await load_image(client, url)
     colors = get_colors(img, n)
     return colors
 
 
-def load_image(client: httpx.Client, url: str) -> Image:
-    response = client.get(url)
+async def load_image(client: httpx.AsyncClient, url: str) -> Image:
+    response = await client.get(url)
     response.raise_for_status()
 
     img = Image.open(BytesIO(response.content))
