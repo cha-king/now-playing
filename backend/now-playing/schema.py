@@ -1,3 +1,5 @@
+from typing import List
+
 from pydantic import BaseModel, HttpUrl
 
 
@@ -15,10 +17,15 @@ class Color(BaseModel):
 class Album(BaseModel):
     name: str
     href: HttpUrl
-    theme: Color
+    artwork_href: HttpUrl
 
 
 class Song(BaseModel):
     name: str
     album: Album
     artist: Artist
+
+
+class NowPlaying(BaseModel):
+    song: Song
+    theme: List[Color]
