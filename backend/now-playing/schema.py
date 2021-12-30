@@ -25,7 +25,7 @@ class Song(BaseModel):
     def from_spotify_response(cls, response):
         return cls(
             name=response['item']['name'],
-            href=response['item']['href'],
+            href=response['item']['external_urls']['spotify'],
             album=Album(
                 name=response['item']['album']['name'],
                 href=response['item']['album']['external_urls']['spotify'],
