@@ -7,7 +7,7 @@ from starlette.websockets import WebSocketDisconnect
 
 from . import sentry
 from . import schema
-from .spotify import Spotify
+from .spotify.client import Client as SpotifyClient
 
 
 LIST_LENGTH = 5
@@ -35,7 +35,7 @@ async def on_startup():
     client_secret = os.getenv("CLIENT_SECRET")
     refresh_token = os.getenv("REFRESH_TOKEN")
 
-    spotify = Spotify(client_id, client_secret, refresh_token)
+    spotify = SpotifyClient(client_id, client_secret, refresh_token)
     spotify.start()
     api.state.spotify = spotify
 
@@ -65,24 +65,14 @@ async def get_recently_played():
     return songs
 
 
-@api.get("/now-playing", response_model=schema.Song)
+@api.get("/now-playing", response_model=schema.NowPlaying)
 async def get_now_playing():
-    currently_playing = api.state.spotify.currently_playing
+    currently_playing = api.state.spotify.now_playing
 
     if currently_playing is None:
         return Response(status_code=204)
 
-    song = schema.Song(
-        name=currently_playing['item']['name'],
-        artist=currently_playing['item']['artists'][0]['name'],
-        album=currently_playing['item']['album']['name'],
-        song_href=currently_playing['context']['external_urls']['spotify'],
-        album_href=currently_playing['item']['album']['external_urls']['spotify'],
-        artist_href=currently_playing['item']['artists'][0]['external_urls']['spotify'],
-        image_href=currently_playing['item']['album']['images'][0]['url'],
-    )
-
-    return song
+    return currently_playing
 
 
 @api.websocket("/ws/now-playing")
