@@ -69,47 +69,24 @@ class Client:
         while True:
             await asyncio.sleep(POLL_TIME.total_seconds())
             try:
-                await self._get_currently_playing_safe()
+                current_song = await self._get_currently_playing_safe()
             except ApiError:
                 logger.exception("Unable to get currently playing")
                 continue
-
             logger.debug("Acquired song")
 
-            if currently_playing:
-                new_id = currently_playing["item"]["id"]
-            else:
-                new_id = None
-
-            if self.currently_playing:
-                current_id = self.currently_playing["item"]["id"]
-            else:
-                current_id = None
-
-            if new_id == current_id:
+            song_id = current_song["item"]["id"] if current_song else None
+            if song_id == self._current_song_id:
                 continue
-
             logger.debug("Song has changed")
 
-            if currently_playing:
-                song = Song(
-                    name=currently_playing['item']['name'],
-                    artist=currently_playing['item']['artists'][0]['name'],
-                    album=currently_playing['item']['album']['name'],
-                    song_href=currently_playing['context']['external_urls']['spotify'],
-                    album_href=currently_playing['item']['album']['external_urls']['spotify'],
-                    artist_href=currently_playing['item']['artists'][0]['external_urls']['spotify'],
-                    image_href=currently_playing['item']['album']['images'][0]['url'],
-                )
-                song_json = dict(song)
-            else:
-                song_json = {}
+            song = Song.from_spotify_response(current_song) if current_song else None
 
-            aws = [websocket.send_json(song_json) for websocket in self._websockets]
-            await asyncio.gather(*aws)
+            await self._publish_song_to_websockets(song)
             logger.debug("Published song to websockets")
 
-            self.currently_playing = currently_playing
+            self._current_song = song
+            self._current_song_id = song_id
 
     async def _get_currently_playing_safe(self) -> Optional[dict]:
         try:
@@ -127,3 +104,8 @@ class Client:
             raise ApiError("'Item' field missing from Spotify response")
 
         return currently_playing
+
+    async def _publish_song_to_websockets(self, song: Optional[Song]):
+        song_dict = song.dict() if song else {}
+        aws = [websocket.send_json(song_dict) for websocket in self._websockets]
+        await asyncio.gather(*aws)
