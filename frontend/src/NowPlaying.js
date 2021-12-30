@@ -12,7 +12,7 @@ function NowPlaying() {
                 setSong(null);
             }
             const data = await response.json();
-            setSong(data);
+            setSong(data.song);
         }
         getNowPlaying();
     }, []);
@@ -50,21 +50,21 @@ function NowPlaying() {
     // return (<Song title={song.name} artist={song.artist} album={song.album} imageUrl={song.image_url}/>)
     return (
         <div className={styles['now-playing']}>
-            <img src={song.image_href} alt={song.album}/>
+            <img src={song.album.artwork_href} alt={song.album.name}/>
             <ul>
                 <li className={styles['song-name']}>
-                    <a href={song.song_href} target="_blank" rel="noreferrer">
+                    <a href={song.href} target="_blank" rel="noreferrer">
                         {song.name}
                     </a>
                 </li>
                 <li className={styles['album-name']}>
-                    <a href={song.album_href} target="_blank" rel="noreferrer">
-                        {song.album}
+                    <a href={song.album.href} target="_blank" rel="noreferrer">
+                        {song.album.name}
                     </a>
                 </li>
                 <li className={styles['artist-name']}>
-                    <a href={song.artist_href} target="_blank" rel="noreferrer">
-                        {song.artist}
+                    <a href={song.artist.href} target="_blank" rel="noreferrer">
+                        {song.artist.name}
                     </a>
                 </li>
             </ul>
