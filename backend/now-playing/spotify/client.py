@@ -9,7 +9,7 @@ from httpx import AsyncClient, RequestError, HTTPStatusError
 
 from .auth import AccessToken
 from .exception import ApiError
-from ..schema import Song, Color, NowPlaying
+from ..schema import Song, NowPlaying, Color
 from .operations import (
     get_currently_playing,
     get_recently_played,
@@ -83,7 +83,7 @@ class Client:
             if current_song:
                 song = Song.from_spotify_response(current_song)
                 colors = await get_colors_from_url(self._client, song.album.artwork_href)
-                theme = [Color(red=color[0], green=color[1], blue=color[2]) for color in colors]
+                theme = [Color(f'rgb{color}') for color in colors]
                 now_playing = NowPlaying(song=song, theme=theme)
             else:
                 song = None
