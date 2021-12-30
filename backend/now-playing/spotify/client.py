@@ -13,6 +13,8 @@ from ..schema import Song
 
 POLL_TIME = datetime.timedelta(seconds=1)
 HTTP_TIMEOUT = 10
+URL_RECENTLY_PLAYED = 'https://api.spotify.com/v1/me/player/recently-played'
+URL_CURRENTLY_PLAYING = 'https://api.spotify.com/v1/me/player/currently-playing'
 
 
 logger = logging.getLogger(__name__)
@@ -30,7 +32,7 @@ class Client:
         access_token = await self._token.get()
 
         response = await self._client.get(
-            'https://api.spotify.com/v1/me/player/recently-played',
+            URL_RECENTLY_PLAYED,
             headers={'Authorization': f'Bearer {access_token}'},
             params={'limit': limit},
         )
@@ -41,7 +43,7 @@ class Client:
         access_token = await self._token.get()
 
         response = await self._client.get(
-            'https://api.spotify.com/v1/me/player/currently-playing',
+            URL_CURRENTLY_PLAYING,
             headers={'Authorization': f'Bearer {access_token}'},
         )
         response.raise_for_status()
