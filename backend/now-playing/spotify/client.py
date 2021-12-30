@@ -9,11 +9,12 @@ from httpx import AsyncClient, RequestError, HTTPStatusError
 
 from .auth import AccessToken
 from .exception import ApiError
-from ..schema import Song, Color
+from ..schema import Song, Color, NowPlaying
 from .operations import (
     get_currently_playing,
     get_recently_played,
 )
+from ..color import get_colors_from_url
 
 
 POLL_TIME = datetime.timedelta(seconds=1)
@@ -80,13 +81,22 @@ class Client:
                 continue
             logger.debug("Song has changed")
 
-            song = Song.from_spotify_response(current_song) if current_song else None
+            if current_song:
+                song = Song.from_spotify_response(current_song)
+                colors = await get_colors_from_url(self._client, song.album.artwork_href)
+                theme = [Color(red=color[0], green=color[1], blue=color[2]) for color in colors]
+                now_playing = NowPlaying(song=song, theme=theme)
+            else:
+                song = None
+                theme = None
+                now_playing = None
 
-            await self._publish_song_to_websockets(song)
-            logger.debug("Published song to websockets")
+            await self._publish_to_websockets(now_playing)
+            logger.debug("Published to websockets")
 
             self._current_song = song
             self._current_song_id = song_id
+            self._current_theme = theme
 
     async def _get_currently_playing_safe(self) -> Optional[dict]:
         try:
@@ -105,7 +115,7 @@ class Client:
 
         return currently_playing
 
-    async def _publish_song_to_websockets(self, song: Optional[Song]):
-        song_dict = song.dict() if song else {}
-        aws = [websocket.send_json(song_dict) for websocket in self._websockets]
+    async def _publish_to_websockets(self, now_playing: Optional[NowPlaying]):
+        now_playing_dict = now_playing.dict() if now_playing else {}
+        aws = [websocket.send_json(now_playing_dict) for websocket in self._websockets]
         await asyncio.gather(*aws)
