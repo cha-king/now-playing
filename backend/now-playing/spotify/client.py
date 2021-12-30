@@ -2,7 +2,7 @@ import asyncio
 import datetime
 import logging
 from asyncio import Task, Future
-from typing import Optional, List
+from typing import Optional
 
 from fastapi import WebSocket
 from httpx import AsyncClient, RequestError, HTTPStatusError
@@ -30,9 +30,8 @@ class Client:
         self._token = AccessToken(self._client, client_id, client_secret, refresh_token)
         self._task: Task = Optional[None]
         self._websockets: set[WebSocket] = set()
-        self._current_song: Optional[Song] = None
         self._current_song_id: Optional[str] = None
-        self._current_theme: Optional[List[Color]] = None
+        self.now_playing: Optional[NowPlaying] = None
 
     async def get_recently_played(self, limit: int = 5) -> dict:
         access_token = await self._token.get()
@@ -94,9 +93,8 @@ class Client:
             await self._publish_to_websockets(now_playing)
             logger.debug("Published to websockets")
 
-            self._current_song = song
             self._current_song_id = song_id
-            self._current_theme = theme
+            self.now_playing = now_playing
 
     async def _get_currently_playing_safe(self) -> Optional[dict]:
         try:
