@@ -1,17 +1,12 @@
 from typing import List
 
 from pydantic import BaseModel, HttpUrl
+from pydantic.color import Color
 
 
 class Artist(BaseModel):
     name: str
     href: HttpUrl
-
-
-class Color(BaseModel):
-    red: int
-    green: int
-    blue: int
 
 
 class Album(BaseModel):
