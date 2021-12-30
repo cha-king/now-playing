@@ -9,12 +9,14 @@ from httpx import AsyncClient, RequestError, HTTPStatusError
 
 from .auth import AccessToken
 from ..schema import Song
+from .operations import (
+    get_currently_playing,
+    get_recently_played,
+)
 
 
 POLL_TIME = datetime.timedelta(seconds=1)
 HTTP_TIMEOUT = 10
-URL_RECENTLY_PLAYED = 'https://api.spotify.com/v1/me/player/recently-played'
-URL_CURRENTLY_PLAYING = 'https://api.spotify.com/v1/me/player/currently-playing'
 
 
 logger = logging.getLogger(__name__)
@@ -30,28 +32,11 @@ class Client:
 
     async def get_recently_played(self, limit: int = 5) -> dict:
         access_token = await self._token.get()
-
-        response = await self._client.get(
-            URL_RECENTLY_PLAYED,
-            headers={'Authorization': f'Bearer {access_token}'},
-            params={'limit': limit},
-        )
-        response.raise_for_status()
-        return response.json()
+        return await get_recently_played(self._client, access_token, limit)
 
     async def get_currently_playing(self) -> Optional[dict]:
         access_token = await self._token.get()
-
-        response = await self._client.get(
-            URL_CURRENTLY_PLAYING,
-            headers={'Authorization': f'Bearer {access_token}'},
-        )
-        response.raise_for_status()
-
-        if response.status_code == 204:
-            return None
-        else:
-            return response.json()
+        return await get_currently_playing(self._client, access_token)
 
     def start(self):
         self._task = asyncio.create_task(self._loop())
