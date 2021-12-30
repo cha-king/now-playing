@@ -2,13 +2,14 @@ import asyncio
 import datetime
 import logging
 from asyncio import Task, Future
-from typing import Optional
+from typing import Optional, List
 
 from fastapi import WebSocket
 from httpx import AsyncClient, RequestError, HTTPStatusError
 
 from .auth import AccessToken
-from ..schema import Song
+from .exception import ApiError
+from ..schema import Song, Color
 from .operations import (
     get_currently_playing,
     get_recently_played,
@@ -26,9 +27,11 @@ class Client:
     def __init__(self, client_id: str, client_secret: str, refresh_token: str):
         self._client = AsyncClient(timeout=HTTP_TIMEOUT)
         self._token = AccessToken(self._client, client_id, client_secret, refresh_token)
-        self.currently_playing: Optional[dict] = None
         self._task: Task = Optional[None]
         self._websockets: set[WebSocket] = set()
+        self._current_song: Optional[Song] = None
+        self._current_song_id: Optional[str] = None
+        self._current_theme: Optional[List[Color]] = None
 
     async def get_recently_played(self, limit: int = 5) -> dict:
         access_token = await self._token.get()
@@ -66,22 +69,12 @@ class Client:
         while True:
             await asyncio.sleep(POLL_TIME.total_seconds())
             try:
-                currently_playing = await self.get_currently_playing()
-            except RequestError:
+                await self._get_currently_playing_safe()
+            except ApiError:
                 logger.exception("Unable to get currently playing")
                 continue
-            except HTTPStatusError as e:
-                if 500 <= e.response.status_code <= 599:
-                    logger.exception("Unable to get currently playing")
-                    continue
-                else:
-                    raise
 
             logger.debug("Acquired song")
-
-            # Weird Spotify response handling
-            if currently_playing and not currently_playing["item"]:
-                continue
 
             if currently_playing:
                 new_id = currently_playing["item"]["id"]
@@ -117,3 +110,20 @@ class Client:
             logger.debug("Published song to websockets")
 
             self.currently_playing = currently_playing
+
+    async def _get_currently_playing_safe(self) -> Optional[dict]:
+        try:
+            currently_playing = await self.get_currently_playing()
+        except RequestError:
+            raise ApiError("Unable to get currently playing")
+        except HTTPStatusError as e:
+            if 500 <= e.response.status_code <= 599:
+                raise ApiError("Unable to get currently playing")
+            else:
+                raise
+
+        # Weird Spotify response handling
+        if currently_playing and not currently_playing["item"]:
+            raise ApiError("'Item' field missing from Spotify response")
+
+        return currently_playing
