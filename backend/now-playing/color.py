@@ -5,7 +5,7 @@ from io import BytesIO
 from typing import List, Tuple
 
 
-QUANTIZATION_FACTOR = 64
+QUANTIZATION_FACTOR = 4
 
 
 async def get_colors_from_url(client: httpx.AsyncClient, url: str, n: int = 4) -> List[Tuple]:
