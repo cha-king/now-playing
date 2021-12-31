@@ -4,18 +4,31 @@ import styles from './NowPlaying.module.css';
 
 function NowPlaying() {
     const [song, setSong] = useState(null);
+    const [theme, setTheme] = useState('#FFFFFF');
     
     useEffect(() => {
         async function getNowPlaying() {
             const response = await fetch('/api/now-playing');
+
+            let song;
+            let theme;
             if (response.status === 204) {
-                setSong(null);
+                song = null;;
+                theme = '#FFFFFF';
+            } else {
+                const data = await response.json();
+                song = data.song;
+                theme = data.theme[0];
             }
-            const data = await response.json();
-            setSong(data.song);
+            setSong(song);
+            setTheme(theme);
         }
         getNowPlaying();
     }, []);
+
+    useEffect(() => {
+        document.body.style.backgroundColor = theme;
+    }, [theme]);
 
     useEffect(() => {
         function connect() {
@@ -25,8 +38,12 @@ function NowPlaying() {
             // const url = 'ws://localhost:8000/api/ws/now-playing';
             const ws = new WebSocket(url);
             ws.onmessage = function(event) {
-                const song = JSON.parse(event.data);
-                setSong(Object.keys(song).length !== 0 ? song : null);
+                const data = JSON.parse(event.data);
+                const song = data.song || null;
+                const theme = data.theme[0] || '#FFFFFF';
+
+                setSong(song);
+                setTheme(theme);
             };
             ws.onclose = function(event) {
                 const delay = 1000 + Math.random() * 1000;
