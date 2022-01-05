@@ -24,7 +24,7 @@ async def load_image(client: httpx.AsyncClient, url: str) -> Image:
 
 
 def get_colors(img: Image, n: int = 4) -> List[Tuple]:
-    q_img = img.quantize(QUANTIZATION_FACTOR)
+    q_img = img.quantize(QUANTIZATION_FACTOR, kmeans=QUANTIZATION_FACTOR)
 
     pallete = q_img.getpalette()
     colors = [tuple(pallete[i:i+3]) for i in range(0, 64*3, 3)]
