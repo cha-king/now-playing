@@ -6,14 +6,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  color: #BC4F43;
-
-  transition: background-color 2s;
-}
-
-header {
-  background-color: #CA7168; 
-  color: #F3DBD8;
+  transition: background-color 2s, color 2s;
 }
 
 a {
