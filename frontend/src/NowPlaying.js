@@ -2,9 +2,11 @@ import { useState, useEffect } from 'react';
 
 import styles from './NowPlaying.module.css';
 
+const defaultTheme = {primary: '#FFFFFF', secondary: '#000000'};
+
 function NowPlaying() {
     const [song, setSong] = useState(null);
-    const [theme, setTheme] = useState('#FFFFFF');
+    const [theme, setTheme] = useState(defaultTheme);
     
     useEffect(() => {
         async function getNowPlaying() {
@@ -13,12 +15,15 @@ function NowPlaying() {
             let song;
             let theme;
             if (response.status === 204) {
-                song = null;;
-                theme = '#FFFFFF';
+                song = null;
+                theme = defaultTheme;
             } else {
                 const data = await response.json();
                 song = data.song;
-                theme = data.theme[0];
+                theme = {
+                    primary: data.theme[0],
+                    secondary: data.theme[1],
+                };
             }
             setSong(song);
             setTheme(theme);
@@ -27,7 +32,8 @@ function NowPlaying() {
     }, []);
 
     useEffect(() => {
-        document.body.style.backgroundColor = theme;
+        document.body.style.backgroundColor = theme.primary;
+        document.body.style.color = theme.secondary;
     }, [theme]);
 
     useEffect(() => {
@@ -40,7 +46,7 @@ function NowPlaying() {
             ws.onmessage = function(event) {
                 const data = JSON.parse(event.data);
                 const song = data.song || null;
-                const theme = data.theme[0] || '#FFFFFF';
+                const theme = {primary: data.theme[0], secondary: data.theme[1]} || defaultTheme;
 
                 setSong(song);
                 setTheme(theme);
