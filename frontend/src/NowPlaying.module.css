@@ -9,6 +9,8 @@
 .now-playing > img {
     box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
     max-width: 100%;
+    border: solid;
+    transition: border 2s;
 }
 
 .now-playing > ul {
