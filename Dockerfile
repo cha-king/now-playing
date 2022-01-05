@@ -22,6 +22,12 @@ RUN pip wheel -r requirements.txt -w ./wheels
 
 FROM python:3.10-slim
 
+RUN apt update && apt install -y \
+    libjpeg62 \
+    libtiff5 \
+    libxcb1 \
+    libopenjp2-7
+
 COPY --from=python-builder /build /build
 
 WORKDIR /build
