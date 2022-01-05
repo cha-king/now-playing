@@ -32,3 +32,24 @@ def get_colors(img: Image, n: int = 4) -> List[Tuple]:
     dom_colors_p = sorted(q_img.getcolors(), key=lambda x: x[0], reverse=True)[:n]
     dom_colors = list(map(lambda x: colors[x[1]], dom_colors_p))
     return dom_colors
+def get_luminance(color: Tuple[int, int, int]) -> float:
+    n_color = [None, None, None]
+    for i, channel in enumerate(color):
+        c = channel / 255
+        if c <= 0.03928:
+            n_color[i] = c / 12.92
+        else:
+            n_color[i] = ((c + 0.055) / 1.055) ** 2.4
+
+    return 0.2126 * n_color[0] + 0.7152 * n_color[1] + 0.0722 * n_color[2]
+
+
+def get_contrast_ratio(base_l: int, ref_l: int) -> float:
+    if base_l > ref_l:
+        l1 = base_l
+        l2 = ref_l
+    else:
+        l1 = ref_l
+        l2 = base_l
+
+    return (l1 + 0.05) / (l2 + 0.05)
