@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 import styles from './NowPlaying.module.css';
 
@@ -7,6 +7,7 @@ const defaultTheme = {primary: '#FFFFFF', secondary: '#000000'};
 function NowPlaying() {
     const [song, setSong] = useState(null);
     const [theme, setTheme] = useState(defaultTheme);
+    const imgRef = useRef(null);
     
     useEffect(() => {
         async function getNowPlaying() {
@@ -34,6 +35,9 @@ function NowPlaying() {
     useEffect(() => {
         document.body.style.backgroundColor = theme.primary;
         document.body.style.color = theme.secondary;
+        if (imgRef.current) {
+            imgRef.current.style.border = `solid ${theme.secondary}`;
+        }
     }, [theme]);
 
     useEffect(() => {
@@ -73,7 +77,7 @@ function NowPlaying() {
     // return (<Song title={song.name} artist={song.artist} album={song.album} imageUrl={song.image_url}/>)
     return (
         <div className={styles['now-playing']}>
-            <img src={song.album.artwork_href} alt={song.album.name}/>
+            <img ref={imgRef} src={song.album.artwork_href} alt={song.album.name}/>
             <ul>
                 <li className={styles['song-name']}>
                     <a href={song.href} target="_blank" rel="noreferrer">
