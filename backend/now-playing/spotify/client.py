@@ -114,6 +114,6 @@ class Client:
         return currently_playing
 
     async def _publish_to_websockets(self, now_playing: Optional[NowPlaying]):
-        now_playing_json = now_playing.json() if now_playing else {}
+        now_playing_json = now_playing.json() if now_playing else "{}"
         aws = [websocket.send_text(now_playing_json) for websocket in self._websockets]
         await asyncio.gather(*aws)
