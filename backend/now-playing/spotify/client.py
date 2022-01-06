@@ -9,7 +9,7 @@ from httpx import AsyncClient, RequestError, HTTPStatusError
 
 from .auth import AccessToken
 from .exception import ApiError
-from ..schema import Song, NowPlaying, Color
+from ..schema import Song, NowPlaying, Color, Theme
 from .operations import (
     get_currently_playing,
     get_recently_played,
@@ -83,7 +83,11 @@ class Client:
             if current_song:
                 song = Song.from_spotify_response(current_song)
                 colors = await get_colors_from_url(self._client, song.album.artwork_href)
-                theme = [Color(f'rgb{color}') for color in colors]
+                primary_color, secondary_color = colors
+                theme = Theme(
+                    primary=Color(f'rgb{primary_color}'),
+                    secondary=Color(f'rgb{secondary_color}'),
+                )
                 now_playing = NowPlaying(song=song, theme=theme)
             else:
                 song = None
@@ -114,6 +118,6 @@ class Client:
         return currently_playing
 
     async def _publish_to_websockets(self, now_playing: Optional[NowPlaying]):
-        now_playing_json = now_playing.json() if now_playing else "{}"
+        now_playing_json = now_playing.json() if now_playing else ""
         aws = [websocket.send_text(now_playing_json) for websocket in self._websockets]
         await asyncio.gather(*aws)

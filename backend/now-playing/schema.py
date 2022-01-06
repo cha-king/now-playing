@@ -38,6 +38,11 @@ class Song(BaseModel):
         )
 
 
+class Theme(BaseModel):
+    primary: Color
+    secondary: Color
+
+
 class NowPlaying(BaseModel):
     song: Song
-    theme: List[Color]
+    theme: Theme

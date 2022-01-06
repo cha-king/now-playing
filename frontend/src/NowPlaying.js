@@ -21,10 +21,7 @@ function NowPlaying() {
             } else {
                 const data = await response.json();
                 song = data.song;
-                theme = {
-                    primary: data.theme[0],
-                    secondary: data.theme[1],
-                };
+                theme = data.theme;
             }
             setSong(song);
             setTheme(theme);
@@ -48,12 +45,14 @@ function NowPlaying() {
             // const url = 'ws://localhost:8000/api/ws/now-playing';
             const ws = new WebSocket(url);
             ws.onmessage = function(event) {
-                const data = JSON.parse(event.data);
-                const song = data.song || null;
-                const theme = {primary: data.theme[0], secondary: data.theme[1]} || defaultTheme;
-
-                setSong(song);
-                setTheme(theme);
+                if (event.data) {
+                    const data = JSON.parse(event.data);
+                    setSong(data.song);
+                    setTheme(data.theme);
+                } else {
+                    setSong(null);
+                    setTheme(defaultTheme);
+                }
             };
             ws.onclose = function(event) {
                 const delay = 1000 + Math.random() * 1000;
