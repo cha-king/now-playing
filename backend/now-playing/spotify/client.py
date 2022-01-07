@@ -8,7 +8,7 @@ from fastapi import WebSocket
 from httpx import AsyncClient, RequestError, HTTPStatusError
 
 from .auth import AccessToken
-from .exception import ApiError
+from .exception import ApiError, RateLimitError
 from ..schema import Song, NowPlaying, Color, Theme
 from .operations import (
     get_currently_playing,
@@ -73,6 +73,10 @@ class Client:
             except ApiError:
                 logger.exception("Unable to get currently playing")
                 continue
+            except RateLimitError as e:
+                logger.exception("Rate limited. Waiting..")
+                await asyncio.sleep(e.retry_time)
+                continue
             logger.debug("Acquired song")
 
             song_id = current_song["item"]["id"] if current_song else None
@@ -108,6 +112,9 @@ class Client:
         except HTTPStatusError as e:
             if 500 <= e.response.status_code <= 599:
                 raise ApiError("Unable to get currently playing")
+            elif e.response.status_code == 429:
+                retry_after = int(e.response.headers['Retry-After'])
+                raise RateLimitError(f"Rate limited. Retry in {retry_after} seconds", retry_after)
             else:
                 raise
 
