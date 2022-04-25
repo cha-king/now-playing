@@ -86,7 +86,11 @@ class Client:
 
             if current_song:
                 song = Song.from_spotify_response(current_song)
+                try:
                 colors = await get_colors_from_url(self._client, song.album.artwork_href)
+                except ApiError:
+                    logger.exception("Unable to download image artwork")
+                    continue
                 primary_color, secondary_color = colors
                 theme = Theme(
                     primary=Color(f'rgb{primary_color}'),
