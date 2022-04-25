@@ -28,7 +28,7 @@ class Client:
     def __init__(self, client_id: str, client_secret: str, refresh_token: str):
         self._client = AsyncClient(timeout=HTTP_TIMEOUT)
         self._token = AccessToken(self._client, client_id, client_secret, refresh_token)
-        self._task: Task = Optional[None]
+        self._task: Optional[Task] = None
         self._websockets: set[WebSocket] = set()
         self._current_song_id: Optional[str] = None
         self.now_playing: Optional[NowPlaying] = None
