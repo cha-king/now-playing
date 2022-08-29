@@ -77,6 +77,9 @@ class Client:
                 logger.exception("Rate limited. Waiting..")
                 await asyncio.sleep(e.retry_time)
                 continue
+            except Exception:
+                logger.exception("Unable to get currently playing")
+                continue
             logger.debug("Acquired song")
 
             song_id = current_song["item"]["id"] if current_song else None
@@ -87,8 +90,8 @@ class Client:
             if current_song:
                 song = Song.from_spotify_response(current_song)
                 try:
-                colors = await get_colors_from_url(self._client, song.album.artwork_href)
-                except ApiError:
+                    colors = await get_colors_from_url(self._client, song.album.artwork_href)
+                except Exception:
                     logger.exception("Unable to download image artwork")
                     continue
                 primary_color, secondary_color = colors
