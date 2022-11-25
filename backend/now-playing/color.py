@@ -1,9 +1,8 @@
-import httpx
-from PIL import Image
-
 from io import BytesIO
 from typing import List, Tuple
 
+import httpx
+from PIL import Image
 
 QUANTIZATION_FACTOR = 4
 
