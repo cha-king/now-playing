@@ -1,7 +1,7 @@
-from functools import lru_cache
 from io import BytesIO
 from typing import List, Tuple
 
+from async_lru import alru_cache
 import httpx
 from PIL import Image
 
@@ -10,7 +10,7 @@ CACHE_SIZE = 64
 QUANTIZATION_FACTOR = 4
 
 
-@lru_cache(CACHE_SIZE)
+@alru_cache(maxsize=CACHE_SIZE)
 async def get_colors_from_url(client: httpx.AsyncClient, url: str, n: int = 4) -> List[Tuple]:
     img = await load_image(client, url)
     colors = get_colors(img, n)
